@@ -1,0 +1,820 @@
+appName = "katalon-testops-single-tenant-dummy-app"
+applicationName = "katalon-analytics"
+#applicationName = "Katalon TestOps Private Instance"
+applicationDescription = "Katalon TestOps Private Instance, a standalone version of the SaaS TestOps Platform"
+#  "workspace": "testops-private-dummy",
+environment = "dummy-katalon-testops-io-production-waf"
+environmentName = "dummy-katalon-testops-io-production-waf"
+environmentConfigTemplateDescription = "Katalon TestOps Private Instance - dummy-katalon-testops-io-production-waf"
+beanstalkRole = "katalon-testops-elasticbeanstalk-role"
+region = "us-east-1"
+subnets = ""
+#bucket = "testopsThrowawayAJKSDHAJKLSHDKHSSADASDALKSDHASJDJKLAS"
+environmentTier = "WebServer"
+cname_prefix = "dummy-katalon-testops-io-production-waf"
+
+environmentVariables = [
+    {
+        namespace = "aws:elasticbeanstalk:application:environment"
+        name = "VAR1"
+        value = "Value1"
+    }
+]
+autoscalingVariables = [
+    {
+        namespace = "aws:autoscaling:asg"
+        name      = "Availability Zones"
+        resource  = "AWSEBAutoScalingGroup"
+        value     = "Any"
+    },
+    {
+        namespace = "aws:autoscaling:asg"
+        name      = "Cooldown"
+        resource  = "AWSEBAutoScalingGroup"
+        value     = "360"
+    },
+    {
+        namespace = "aws:autoscaling:asg"
+        name      = "Custom Availability Zones"
+        resource  = "AWSEBAutoScalingGroup"
+        value     = ""
+    },
+    {
+        namespace = "aws:autoscaling:asg"
+        name      = "EnableCapacityRebalancing"
+        resource  = "AWSEBAutoScalingGroup"
+        value     = "false"
+    },
+    {
+        namespace = "aws:autoscaling:asg"
+        name      = "MaxSize"
+        resource  = "AWSEBAutoScalingGroup"
+        value     = "5"
+    },
+    {
+        namespace = "aws:autoscaling:asg"
+        name      = "MinSize"
+        resource  = "AWSEBAutoScalingGroup"
+        value     = "3"
+    }
+]
+tags = {
+    Fancy = "yes"
+    IgnoreThis = "true" 
+}
+
+/**
+resource "aws_elastic_beanstalk_environment" "katalon-testops-private-instance-environment" {
+  name                = var.environmentName
+  application         = aws_elastic_beanstalk_application.katalon-testops-private-instance.name
+  solution_stack_name = var.solution_stack_name
+  tier                = var.environmentTier
+  cname_prefix        = var.cname_prefix
+}
+
+##############################
+# elastic beanstalk
+##############################
+# config for testops-io-prod
+resource "aws_elastic_beanstalk_configuration_template" "katalon-testops-private-instance-template" {
+
+
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "BlockDeviceMappings"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "EC2KeyName"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = var.ec2_key_name
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "IamInstanceProfile"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = "aws-elasticbeanstalk-ec2-role"
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "ImageId"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = "ami-0bf5a8f68e615d396"
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "InstanceType"
+    value     = "t3a.large"
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "MonitoringInterval"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = "1 minute"
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "RootVolumeIOPS"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "RootVolumeSize"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = "40"
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "RootVolumeThroughput"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "RootVolumeType"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = "gp2"
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "SSHSourceRestriction"
+    value     = "tcp,22,22,0.0.0.0/0"
+  }
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "SecurityGroups"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = "sg-0dce0161262038fa8,sg-0958fe906cc9ac79c"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "BreachDuration"
+    resource  = "AWSEBCloudwatchAlarmLow"
+    value     = "5"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "EvaluationPeriods"
+    resource  = "AWSEBCloudwatchAlarmLow"
+    value     = "1"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "LowerBreachScaleIncrement"
+    resource  = "AWSEBAutoScalingScaleDownPolicy"
+    value     = "-1"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "LowerThreshold"
+    resource  = "AWSEBCloudwatchAlarmLow"
+    value     = "20"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "MeasureName"
+    resource  = "AWSEBCloudwatchAlarmLow"
+    value     = "CPUUtilization"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "Period"
+    resource  = "AWSEBCloudwatchAlarmLow"
+    value     = "5"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "Statistic"
+    resource  = "AWSEBCloudwatchAlarmLow"
+    value     = "Average"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "Unit"
+    resource  = "AWSEBCloudwatchAlarmLow"
+    value     = "Percent"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "UpperBreachScaleIncrement"
+    resource  = "AWSEBAutoScalingScaleUpPolicy"
+    value     = "1"
+  }
+  setting {
+    namespace = "aws:autoscaling:trigger"
+    name      = "UpperThreshold"
+    resource  = "AWSEBCloudwatchAlarmHigh"
+    value     = "35"
+  }
+  setting {
+    namespace = "aws:autoscaling:updatepolicy:rollingupdate"
+    name      = "MaxBatchSize"
+    resource  = "AWSEBAutoScalingGroup"
+    value     = "1"
+  }
+  setting {
+    namespace = "aws:autoscaling:updatepolicy:rollingupdate"
+    name      = "MinInstancesInService"
+    resource  = "AWSEBAutoScalingGroup"
+    value     = "1"
+  }
+  setting {
+    namespace = "aws:autoscaling:updatepolicy:rollingupdate"
+    name      = "PauseTime"
+    resource  = "AWSEBAutoScalingGroup"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:autoscaling:updatepolicy:rollingupdate"
+    name      = "RollingUpdateEnabled"
+    resource  = "AWSEBAutoScalingGroup"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:autoscaling:updatepolicy:rollingupdate"
+    name      = "RollingUpdateType"
+    resource  = "AWSEBAutoScalingGroup"
+    value     = "Health"
+  }
+  setting {
+    namespace = "aws:autoscaling:updatepolicy:rollingupdate"
+    name      = "Timeout"
+    resource  = "AWSEBAutoScalingGroup"
+    value     = "PT30M"
+  }
+  setting {
+    namespace = "aws:cloudformation:template:parameter"
+    name      = "AppSource"
+    value     = "https://elasticbeanstalk-samples-us-east-1.s3.amazonaws.com/java-sample-app-v3.zip"
+  }
+  setting {
+    namespace = "aws:cloudformation:template:parameter"
+    name      = "EnvironmentVariables"
+    value     = "M2=/usr/local/apache-maven/bin,SPRING_DATASOURCE_PASSWORD=V_]MXGP=&'U8,M2_HOME=/usr/local/apache-maven,SPRING_PROFILES_ACTIVE=fixed,aws,production,production-io,JAVA_HOME=/usr/lib/jvm/java,SPRING_DATASOURCE_USERNAME=root,KIT_LOG_FOLDER=/var/log/testops,KATALON_JVM_OPTIONS=-Xmx7168m -Dfile.encoding=UTF-8,GRADLE_HOME=/usr/local/gradle"
+  }
+  setting {
+    namespace = "aws:cloudformation:template:parameter"
+    name      = "HooksPkgUrl"
+    value     = "https://s3.dualstack.us-east-1.amazonaws.com/elasticbeanstalk-env-resources-us-east-1/stalks/eb_java_1.0.202923.0_1627508403/lib/hooks.tar.gz"
+  }
+  setting {
+    namespace = "aws:cloudformation:template:parameter"
+    name      = "InstancePort"
+    value     = "80"
+  }
+  setting {
+    namespace = "aws:cloudformation:template:parameter"
+    name      = "InstanceTypeFamily"
+    value     = "t3a"
+  }
+  setting {
+    namespace = "aws:cloudformation:template:parameter"
+    name      = "StaticFiles"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:ec2:instances"
+    name      = "EnableSpot"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:ec2:instances"
+    name      = "InstanceTypes"
+    value     = "t3a.large, t3a.medium, t3.medium"
+  }
+  setting {
+    namespace = "aws:ec2:instances"
+    name      = "SpotFleetOnDemandAboveBasePercentage"
+    value     = "70"
+  }
+  setting {
+    namespace = "aws:ec2:instances"
+    name      = "SpotFleetOnDemandBase"
+    value     = "0"
+  }
+  setting {
+    namespace = "aws:ec2:instances"
+    name      = "SpotMaxPrice"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "AssociatePublicIpAddress"
+    resource  = "AWSEBAutoScalingLaunchConfiguration"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "ELBScheme"
+    value     = "public"
+  }
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "ELBSubnets"
+    value     = "subnet-bdeb12f4,subnet-0a858b52"
+  }
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "Subnets"
+    resource  = "AWSEBAutoScalingGroup"
+    value     = "subnet-baeb12f3,subnet-f6858bae"
+  }
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "VPCId"
+    resource  = "AWSEBLoadBalancerSecurityGroup"
+    value     = "vpc-5b67113c"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application"
+    name      = "Application Healthcheck URL"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "GRADLE_HOME"
+    value     = "/usr/local/gradle"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "JAVA_HOME"
+    value     = "/usr/lib/jvm/java"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "KATALON_JVM_OPTIONS"
+    value     = "-Xmx7168m -Dfile.encoding=UTF-8"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "KIT_LOG_FOLDER"
+    value     = "/var/log/testops"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "M2"
+    value     = "/usr/local/apache-maven/bin"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "M2_HOME"
+    value     = "/usr/local/apache-maven"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "SPRING_DATASOURCE_PASSWORD"
+    value     = "V_]MXGP=&'U8"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "SPRING_DATASOURCE_USERNAME"
+    value     = "root"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "SPRING_PROFILES_ACTIVE"
+    value     = "fixed,aws,production,production-io"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "DeleteOnTerminate"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "RetentionInDays"
+    value     = "7"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+    name      = "StreamLogs"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs:health"
+    name      = "DeleteOnTerminate"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs:health"
+    name      = "HealthStreamingEnabled"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:cloudwatch:logs:health"
+    name      = "RetentionInDays"
+    value     = "7"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:command"
+    name      = "BatchSize"
+    value     = "100"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:command"
+    name      = "BatchSizeType"
+    value     = "Percentage"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:command"
+    name      = "DeploymentPolicy"
+    value     = "RollingWithAdditionalBatch"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:command"
+    name      = "IgnoreHealthCheck"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:command"
+    name      = "Timeout"
+    value     = "600"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:control"
+    name      = "DefaultSSHPort"
+    value     = "22"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:control"
+    name      = "LaunchTimeout"
+    value     = "0"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:control"
+    name      = "LaunchType"
+    value     = "Migration"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:control"
+    name      = "RollbackLaunchOnFailure"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:customoption"
+    name      = "CloudWatchMetrics"
+    value     = "--mem-util --mem-used --mem-avail --disk-space-util --disk-space-used --disk-space-avail --disk-path=/ --auto-scaling"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "EnvironmentType"
+    value     = "LoadBalanced"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "ExternalExtensionsS3Bucket"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "ExternalExtensionsS3Key"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "LoadBalancerIsShared"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "LoadBalancerType"
+    value     = "application"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "ServiceRole"
+    value     = "arn:aws:iam::346625874447:role/aws-elasticbeanstalk-service-role"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "DeregistrationDelay"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "20"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "HealthCheckInterval"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "15"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "HealthCheckPath"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "/health-checker"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "HealthCheckTimeout"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "5"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "HealthyThresholdCount"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "3"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "MatcherHTTPCode"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "Port"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "5000"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "Protocol"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "HTTP"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "StickinessEnabled"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "StickinessLBCookieDuration"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "86400"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "StickinessType"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "lb_cookie"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:environment:process:default"
+    name      = "UnhealthyThresholdCount"
+    resource  = "AWSEBV2LoadBalancerTargetGroup"
+    value     = "5"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:healthreporting:system"
+    name      = "ConfigDocument"
+    value     = jsonencode({
+        "CloudWatchMetrics" = {
+          "Environment" = {
+            "ApplicationRequests2xx" = 60
+            "ApplicationRequests5xx" = 60
+            "ApplicationRequests4xx" = 60
+          }
+          "Instance" = {
+            "ApplicationRequestsTotal" = 60
+          }
+        }
+        "Version" = 1
+    })
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:healthreporting:system"
+    name      = "EnhancedHealthAuthEnabled"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:healthreporting:system"
+    name      = "HealthCheckSuccessThreshold"
+    value     = "Ok"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:healthreporting:system"
+    name      = "SystemType"
+    value     = "enhanced"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:hostmanager"
+    name      = "LogPublicationControl"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:managedactions"
+    name      = "ManagedActionsEnabled"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:managedactions"
+    name      = "PreferredStartTime"
+    value     = "SUN:03:00"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:managedactions"
+    name      = "ServiceRoleForManagedUpdates"
+    value     = "arn:aws:iam::346625874447:role/aws-elasticbeanstalk-service-role"
+    #### TODO: fix this
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:managedactions:platformupdate"
+    name      = "InstanceRefreshEnabled"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:managedactions:platformupdate"
+    name      = "UpdateLevel"
+    value     = "minor"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:monitoring"
+    name      = "Automatically Terminate Unhealthy Instances"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:sns:topics"
+    name      = "Notification Endpoint"
+    value     = ""
+    #### TODO: fix this
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:sns:topics"
+    name      = "Notification Protocol"
+    value     = "email"
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:sns:topics"
+    name      = "Notification Topic ARN"
+    value     = ""
+    #### TODO: fix this
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:sns:topics"
+    name      = "Notification Topic Name"
+    value     = ""
+    #### TODO: fix this
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:trafficsplitting"
+    name      = "EvaluationTime"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:trafficsplitting"
+    name      = "NewVersionPercent"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elasticbeanstalk:xray"
+    name      = "XRayEnabled"
+    value     = "false"
+  }
+  setting {
+    namespace = "aws:elbv2:listener:443"
+    name      = "DefaultProcess"
+    resource  = "AWSEBV2LoadBalancerListener443"
+    value     = "default"
+  }
+  setting {
+    namespace = "aws:elbv2:listener:443"
+    name      = "ListenerEnabled"
+    resource  = "AWSEBV2LoadBalancerListener443"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elbv2:listener:443"
+    name      = "Protocol"
+    resource  = "AWSEBV2LoadBalancerListener443"
+    value     = "HTTPS"
+  }
+  setting {
+    namespace = "aws:elbv2:listener:443"
+    name      = "Rules"
+    resource  = "AWSEBV2LoadBalancerListener443"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elbv2:listener:443"
+    name      = "SSLCertificateArns"
+    resource  = "AWSEBV2LoadBalancerListener443"
+    value     = "arn:aws:acm:us-east-1:346625874447:certificate/cf10f28c-b857-4f37-8daa-95f2d6ec81ce"
+    #### TODO: fix this
+  }
+  setting {
+    namespace = "aws:elbv2:listener:443"
+    name      = "SSLPolicy"
+    resource  = "AWSEBV2LoadBalancerListener443"
+    value     = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
+  }
+  setting {
+    namespace = "aws:elbv2:listener:default"
+    name      = "DefaultProcess"
+    resource  = "AWSEBV2LoadBalancerListener"
+    value     = "default"
+  }
+  setting {
+    namespace = "aws:elbv2:listener:default"
+    name      = "ListenerEnabled"
+    resource  = "AWSEBV2LoadBalancerListener"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elbv2:listener:default"
+    name      = "Protocol"
+    resource  = "AWSEBV2LoadBalancerListener"
+    value     = "HTTP"
+  }
+  setting {
+    namespace = "aws:elbv2:listener:default"
+    name      = "Rules"
+    resource  = "AWSEBV2LoadBalancerListener"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elbv2:listener:default"
+    name      = "SSLCertificateArns"
+    resource  = "AWSEBV2LoadBalancerListener"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elbv2:listener:default"
+    name      = "SSLPolicy"
+    resource  = "AWSEBV2LoadBalancerListener"
+    value     = ""
+  }
+  setting {
+    namespace = "aws:elbv2:loadbalancer"
+    name      = "AccessLogsS3Bucket"
+    resource  = "AWSEBV2LoadBalancer"
+    value     = "katalon-sec-testops"
+    #### TODO: fix this
+  }
+  setting {
+    namespace = "aws:elbv2:loadbalancer"
+    name      = "AccessLogsS3Enabled"
+    resource  = "AWSEBV2LoadBalancer"
+    value     = "true"
+  }
+  setting {
+    namespace = "aws:elbv2:loadbalancer"
+    name      = "AccessLogsS3Prefix"
+    resource  = "AWSEBV2LoadBalancer"
+    value     = "testops"
+    #### TODO: fix this
+  }
+  setting {
+    namespace = "aws:elbv2:loadbalancer"
+    name      = "IdleTimeout"
+    resource  = "AWSEBV2LoadBalancer"
+    value     = "3600"
+  }
+  setting {
+    namespace = "aws:elbv2:loadbalancer"
+    name      = "SecurityGroups"
+    resource  = "AWSEBV2LoadBalancer"
+    value     = "sg-o41451f6d3cdbf4cb"
+    #### TODO: fix this
+  }
+}
+
+resource "aws_elastic_beanstalk_environment" "katalon-testops-io-production-waf" {
+  name                = var.katalon_testops_io_production_waf.name
+  application         = var.application_name
+  # version_label = "199-da072b780e840c54ee8263e49d48129dc7835114"
+  solution_stack_name = var.katalon_testops_io_production_waf.solution_stack_name
+  # platform_arn = "arn:aws:elasticbeanstalk:us-east-1::platform/Java 8 running on 64bit Amazon Linux/2.11.11"
+  description         = var.katalon_testops_io_production_waf.description
+  tier                = var.katalon_testops_io_production_waf.tier
+  cname_prefix        = var.katalon_testops_io_production_waf.cname_prefix
+}
+
+
+/**
+# this is what it's called in prod...
+resource "aws_iam_role" "IAMRole" {
+  path                 = "/"
+  name                 = "aws-elasticbeanstalk-service-role"
+  assume_role_policy   = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Sid       = ""
+        Principal = {
+          "Service" = "elasticbeanstalk.amazonaws.com"
+        }
+        Condition = {
+          "StringEquals" = {
+            "sts:ExternalId" = "elasticbeanstalk"
+          }
+        }
+      }
+    ]
+  })
+  max_session_duration = 3600
+  tags                 = var.tags
+}
+**/
+
+/**
+TODO: REfactor the following into the above
+*/
