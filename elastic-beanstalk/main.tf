@@ -1,7 +1,7 @@
 #locals {
 #  server_properties = join("\n", [for k, v in var.server_properties : format("%s = %s", k, v)])
 #  enable_logs       = var.s3_logs_bucket != "" || var.cloudwatch_logs_group != "" || var.firehose_logs_delivery_stream != "" ? ["true"] : []
-#}
+#}  adsds
 
 terraform {
   required_providers {
@@ -42,7 +42,7 @@ resource "aws_elastic_beanstalk_application" "this" {
   //]
 }
 
-resource "aws_elastic_beanstalk_environment" "testops-waf" {
+resource "aws_elastic_beanstalk_environment" "testops-waf-peter" {
   name                = "katalon-testops-production-waf-peter"
   application         = aws_elastic_beanstalk_application.this.name
   # solution_stack_name = "64bit Amazon Linux 2 v3.2.8 running Corretto 8"
@@ -883,7 +883,7 @@ value = "sg-008029f1b79109bc5"
 TODO: FIX SETTINGS
 **/
 
-resource "aws_iam_policy" "MemoryUsageForEB-Cloudwatch" {
+resource "aws_iam_policy" "MemoryUsageForEB-Cloudwatch-peter" {
   name   = "MemoryUsageForEB-Cloudwatch"
   path   = "/"
   policy = <<EOF
