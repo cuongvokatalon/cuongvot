@@ -884,7 +884,7 @@ TODO: FIX SETTINGS
 **/
 
 resource "aws_iam_policy" "MemoryUsageForEB-Cloudwatch-peter" {
-  name   = "MemoryUsageForEB-Cloudwatch"
+  name   = "MemoryUsageForEB-Cloudwatch-peter"
   path   = "/"
   policy = <<EOF
 {
