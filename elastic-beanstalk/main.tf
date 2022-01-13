@@ -478,7 +478,7 @@ resource "aws_elastic_beanstalk_environment" "testops-waf-peter" {
   setting {
     name      = "Subnets"
     namespace = "aws:ec2:vpc"
-    value     = "10.0.1.0/24,10.0.2.0/24"
+    value     = "10.0.101.0/24,10.0.102.0/24"
   }
   setting {
     name      = "SupportedArchitectures"
