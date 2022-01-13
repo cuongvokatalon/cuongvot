@@ -145,7 +145,7 @@ resource "aws_elastic_beanstalk_environment" "testops-waf-peter" {
   setting {
     name      = "ELBSubnets"
     namespace = "aws:ec2:vpc"
-    value     = var.public_subnets
+    value     = "10.0.101.0/24,10.0.102.0/24"
   }
   setting {
     name      = "EnableCapacityRebalancing"
@@ -478,7 +478,7 @@ resource "aws_elastic_beanstalk_environment" "testops-waf-peter" {
   setting {
     name      = "Subnets"
     namespace = "aws:ec2:vpc"
-    value     = var.private_subnets
+    value     = "10.0.1.0/24,10.0.2.0/24"
   }
   setting {
     name      = "SupportedArchitectures"
@@ -524,7 +524,7 @@ resource "aws_elastic_beanstalk_environment" "testops-waf-peter" {
   setting {
     name      = "VPCId"
     namespace = "aws:ec2:vpc"
-    value     = var.vpcID
+    value     = "vpc-07073eb719d983655"
   }
   setting {
     name      = "XRayEnabled"
