@@ -149,7 +149,7 @@ variable "katalon_testops_production_queue_waf-peter" {
 }
 
 variable "vpcID" {
-  default = ""
+  default = "vpc-07073eb719d983655"
 }
 
 variable "vpcName" {
