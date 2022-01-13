@@ -1,7 +1,7 @@
 #locals {
 #  server_properties = join("\n", [for k, v in var.server_properties : format("%s = %s", k, v)])
 #  enable_logs       = var.s3_logs_bucket != "" || var.cloudwatch_logs_group != "" || var.firehose_logs_delivery_stream != "" ? ["true"] : []
-#}  adsds
+#}
 
 terraform {
   required_providers {
@@ -145,7 +145,7 @@ resource "aws_elastic_beanstalk_environment" "testops-waf-peter" {
   setting {
     name      = "ELBSubnets"
     namespace = "aws:ec2:vpc"
-    value     = "10.0.101.0/24,10.0.102.0/24"
+    value     = var.public_subnets
   }
   setting {
     name      = "EnableCapacityRebalancing"
@@ -478,7 +478,7 @@ resource "aws_elastic_beanstalk_environment" "testops-waf-peter" {
   setting {
     name      = "Subnets"
     namespace = "aws:ec2:vpc"
-    value     = "10.0.101.0/24,10.0.102.0/24"
+    value     = var.private_subnets
   }
   setting {
     name      = "SupportedArchitectures"
